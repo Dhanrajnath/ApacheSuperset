@@ -42,6 +42,12 @@
               {{ lib.render_field(form.csv_file, null, null, begin_sep_field, end_sep_field) }}
             </tr>
             <tr>
+              {{ lib.render_field(form.auth_username, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
+            </tr>
+            <tr>
+              {{ lib.render_field(form.auth_password, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
+            </tr>
+            <tr>
               {{ lib.render_field(form.table_name, begin_sep_label, end_sep_label, begin_sep_field, end_sep_field) }}
             </tr>
             <tr>
