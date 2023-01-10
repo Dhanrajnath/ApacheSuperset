@@ -338,7 +338,6 @@ export default function MenuWrapper({ data, ...rest }: MenuProps) {
 
       newItem.childs = children;
     }
-
     if (!settingsMenus.hasOwnProperty(item.name)) {
       cleanedMenu.push(newItem);
     } else {

@@ -19,6 +19,9 @@ import os
 import tempfile
 import zipfile
 from typing import Any, TYPE_CHECKING
+import requests
+from urllib.parse import urlparse
+from pathlib import Path
 
 import pandas as pd
 from flask import flash, g, redirect
@@ -44,6 +47,8 @@ from superset.views.base import DeleteMixin, SupersetModelView, YamlExportMixin
 from .forms import ColumnarToDatabaseForm, CsvToDatabaseForm, ExcelToDatabaseForm
 from .mixins import DatabaseMixin
 from .validators import schema_allows_file_upload, sqlalchemy_uri_validator
+from dotenv import load_dotenv
+load_dotenv()
 
 if TYPE_CHECKING:
     from werkzeug.datastructures import FileStorage
@@ -157,7 +162,7 @@ class CustomFormView(SimpleFormView):
 class CsvToDatabaseView(CustomFormView):
     form = CsvToDatabaseForm
     form_template = "superset/form_view/csv_to_database_view/edit.html"
-    form_title = _("CSV to Database configuration")
+    form_title = _("API URL/CSV to Database configuration")
     add_columns = ["database", "schema", "table_name"]
 
     def form_get(self, form: CsvToDatabaseForm) -> None:
@@ -171,6 +176,67 @@ class CsvToDatabaseView(CustomFormView):
         form.if_exists.data = "fail"
 
     def form_post(self, form: CsvToDatabaseForm) -> Response:
+        is_json = False
+        url = form.api_url.data
+        domain = ""
+        token = ""
+        api_url_header = ""
+        base_path = f"{os.getcwd()}/superset/views/database/"
+        file_path = base_path
+        existing_files = os.listdir(file_path)
+        for file in existing_files:
+            if file.endswith(".csv"):
+                os.remove(os.path.join(file_path, file))
+        if (url):
+            domain = urlparse(url).netloc
+            if form.auth_username.data:
+                # trying to authenticate api with username and password provided
+                try:
+                    payload = {
+                                "grant_type": "password",
+                                "username": form.auth_username.data,
+                                "password": form.auth_password.data,
+                                "audience": os.getenv("AUDIENCE"),
+                                "client_id": os.getenv("CLIENT_ID"),
+                                "client_secret": os.getenv("CLIENT_SECRET")
+                            }
+                    headers = { 'content-type': "application/json" }
+                    login = requests.post(url=os.getenv("AUTH0_URL"), json=payload, headers=headers)                
+                    token = login.json()['access_token']
+                    api_url_header = { 'authorization': f"Bearer {token}" }
+                except Exception as e:
+                    message = __(
+                                'Invalid username or password',
+                                error_msg=str(e),
+                            )
+                    flash(message, "danger")
+                    stats_logger.incr("failed_csv_upload")
+                    return redirect("/csvtodatabaseview/form")
+                                    
+            try:
+                api_response = requests.get(url, headers=api_url_header)
+                is_json = True
+
+                # Get the response from api
+                result = api_response.json()["data"]
+
+                # using pd.DataFrame convert json to dataframe
+                df = pd.DataFrame(result)
+
+                # convert this dataframe to CSV and assigning it to form.csv_file attribute
+                file_path += f"{form.table_name.data+'_'+domain.split('.')[0]}json.csv"
+                df.to_csv(file_path, index=False)
+                form.csv_file.data = file_path
+
+            except Exception as e:
+                message = __(
+                            'Unable to process API request, please try again!',
+                            error_msg=str(e),
+                        )
+                flash(message, "danger")
+                stats_logger.incr("failed_csv_upload")
+                return redirect("/csvtodatabaseview/form")
+
         database = form.database.data
         csv_table = Table(table=form.table_name.data, schema=form.schema.data)
         delimiter_input = form.delimiter.data
@@ -193,7 +259,7 @@ class CsvToDatabaseView(CustomFormView):
                 pd.read_csv(
                     chunksize=1000,
                     encoding="utf-8",
-                    filepath_or_buffer=form.csv_file.data,
+                    filepath_or_buffer=file_path if is_json  else form.csv_file.data,
                     header=form.header.data if form.header.data else 0,
                     index_col=form.index_col.data,
                     infer_datetime_format=form.infer_datetime_format.data,
@@ -269,7 +335,7 @@ class CsvToDatabaseView(CustomFormView):
                 'Unable to upload CSV file "%(filename)s" to table '
                 '"%(table_name)s" in database "%(db_name)s". '
                 "Error message: %(error_msg)s",
-                filename=form.csv_file.data.filename,
+                filename="generated from api response" if is_json else form.csv_file.data.filename,
                 table_name=form.table_name.data,
                 db_name=database.database_name,
                 error_msg=str(ex),
@@ -283,7 +349,7 @@ class CsvToDatabaseView(CustomFormView):
         message = __(
             'CSV file "%(csv_filename)s" uploaded to table "%(table_name)s" in '
             'database "%(db_name)s"',
-            csv_filename=form.csv_file.data.filename,
+            csv_filename="generated from api response" if is_json else form.csv_file.data.filename,
             table_name=str(csv_table),
             db_name=sqla_table.database.database_name,
         )

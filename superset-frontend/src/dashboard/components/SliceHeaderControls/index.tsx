@@ -54,6 +54,7 @@ import ViewQueryModal from 'src/explore/components/controls/ViewQueryModal';
 import { ResultsPaneOnDashboard } from 'src/explore/components/DataTablesPane';
 import Modal from 'src/components/Modal';
 import { DrillDetailMenuItems } from 'src/components/Chart/DrillDetail';
+import { Switch } from 'src/components/Switch';
 
 const MENU_KEYS = {
   CROSS_FILTER_SCOPING: 'cross_filter_scoping',
@@ -67,6 +68,7 @@ const MENU_KEYS = {
   VIEW_QUERY: 'view_query',
   VIEW_RESULTS: 'view_results',
   DRILL_TO_DETAIL: 'drill_to_detail',
+  AUTO_REFRESH: 'auto_refresh',
 };
 
 const VerticalDotsContainer = styled.div`
@@ -142,11 +144,13 @@ export interface SliceHeaderControlsProps {
   supersetCanCSV?: boolean;
   sliceCanEdit?: boolean;
 }
+
 type SliceHeaderControlsPropsWithRouter = SliceHeaderControlsProps &
   RouteComponentProps;
 interface State {
   showControls: boolean;
   showCrossFilterScopingModal: boolean;
+  intervalId: any;
 }
 
 const dropdownIconsStyles = css`
@@ -246,6 +250,7 @@ class SliceHeaderControls extends React.PureComponent<
     this.state = {
       showControls: false,
       showCrossFilterScopingModal: false,
+      intervalId: 0,
     };
   }
 
@@ -255,6 +260,24 @@ class SliceHeaderControls extends React.PureComponent<
         this.props.slice.slice_id,
         this.props.dashboardId,
       );
+    }
+  }
+
+  autoRefreshChart(refreshInterval = 0, sliceId: number, dashboardId: number) {
+    if (refreshInterval !== 0) {
+      this.setState({
+        intervalId: setInterval(() => {
+          this.props.addSuccessToast(
+            `Auto Refreshed ${this.props.slice.slice_name}`,
+          );
+          if (this.props.updatedDttm) {
+            this.props.forceRefresh(sliceId, dashboardId);
+          }
+        }, refreshInterval * 1000),
+      });
+    } else {
+      // eslint-disable-next-line no-unused-expressions
+      this.state.intervalId && clearInterval(this.state.intervalId);
     }
   }
 
@@ -523,6 +546,32 @@ class SliceHeaderControls extends React.PureComponent<
 
     return (
       <>
+        {t('Auto Refresh (5 seconds)')}
+        <Switch
+          title="Auto Refresh for 5 seconds"
+          loading={this.props.chartStatus === 'loading'}
+          onChange={(event: any) => {
+            if (event) {
+              this.autoRefreshChart(
+                5,
+                this.props.slice.slice_id,
+                this.props.dashboardId,
+              );
+              this.props.addSuccessToast(
+                `Updated Auto Refresh ${this.props.slice.slice_name}`,
+              );
+            } else {
+              this.autoRefreshChart(
+                0,
+                this.props.slice.slice_id,
+                this.props.dashboardId,
+              );
+              this.props.addSuccessToast(
+                `Auto Refresh off for ${this.props.slice.slice_name}`,
+              );
+            }
+          }}
+        />
         <CrossFilterScopingModal
           chartId={slice.slice_id}
           isOpen={this.state.showCrossFilterScopingModal}

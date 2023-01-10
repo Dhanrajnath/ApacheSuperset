@@ -17,7 +17,7 @@
 """Contains the logic to create cohesive forms on the explore view"""
 from typing import List
 
-from flask_appbuilder.fieldwidgets import BS3TextFieldWidget
+from flask_appbuilder.fieldwidgets import BS3TextFieldWidget, BS3PasswordFieldWidget
 from flask_appbuilder.forms import DynamicForm
 from flask_babel import lazy_gettext as _
 from flask_wtf.file import FileAllowed, FileField, FileRequired
@@ -105,11 +105,37 @@ class UploadToDatabaseForm(DynamicForm):
 
 
 class CsvToDatabaseForm(UploadToDatabaseForm):
-    csv_file = FileField(
-        _("CSV Upload"),
-        description=_("Select a file to be uploaded to the database"),
+    api_url = StringField(
+        _("API URL/CSV Upload"),
+        description=_(
+            "(1st Priority) Please enter a valid API URL to get data"),
         validators=[
-            FileRequired(),
+            # DataRequired()
+            ],
+        widget=BS3TextFieldWidget(),
+    )
+    auth_username = StringField(
+        _("Authorized username"),
+        description=_(
+            "provide your username"),
+        validators=[
+            ],
+        widget=BS3TextFieldWidget(),
+    )
+    auth_password = StringField(
+        _("Authorized passowrd"),
+        description=_(
+            "provide your password for authorizing the API"),
+        validators=[
+            # DataRequired()
+            ],
+        widget=BS3PasswordFieldWidget(),
+    )
+    csv_file = FileField(
+        _(""),
+        description=_("(2nd Priority) Select a file to be uploaded to the database"),
+        validators=[
+            # FileRequired(),
             FileAllowed(
                 config["ALLOWED_EXTENSIONS"].intersection(config["CSV_EXTENSIONS"]),
                 _(
