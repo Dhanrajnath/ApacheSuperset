@@ -35,9 +35,6 @@ jobs:
     if: github.event.pull_request.draft == false
     name: CD - deploy on ec2
     runs-on: ubuntu-latest
-    defaults: 
-       run: 
-         working-directory: backend
     needs:
       - CI     
     steps:
