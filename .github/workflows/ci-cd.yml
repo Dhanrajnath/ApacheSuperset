@@ -1,0 +1,63 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review]
+
+jobs:
+  # CI:
+  #   if: github.event.pull_request.draft == false
+  #   name: CI build docker and push to registry
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+  #       uses: actions/checkout@v2
+  #       with:
+  #         persist-credentials: false
+
+  #     - shell: bash
+  #       env:
+  #         DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+  #         DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  #       run: |
+  #         .github/workflows/docker_build_push.sh
+
+  #     - name: Upload build artifacts
+  #       if: github.event_name == 'pull_request'
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: build
+  #         path: build/
+  CD:
+    if: github.event.pull_request.draft == false
+    name: CD - deploy on ec2
+    runs-on: ubuntu-latest
+    # needs:
+    #   - CI     
+    steps:
+      - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+        uses: actions/checkout@v2
+      - name: Add SSH key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          echo -e "${{ secrets.SSH_KEY }}" > /home/runner/.ssh/github_actions
+          chmod 600 /home/runner/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null   
+          ssh-add /home/runner/.ssh/github_actions
+          tar -czvf temp.tar.gz docker
+          scp -i ~/.ssh/github_actions temp.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/ubuntu/
+
+      - name: Build and deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp.tar.gz;rm -rf temp.tar.gz;ls -lsa"
+          # ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
+          # docker-compose -f docker/docker-compose-non-dev.yml up -d"
+          exit
