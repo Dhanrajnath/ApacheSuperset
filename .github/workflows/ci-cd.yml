@@ -55,7 +55,6 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions
-          "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
+          ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
           ls"
           exit
