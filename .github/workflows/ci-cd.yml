@@ -64,9 +64,7 @@ jobs:
           ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp2.tar.gz;rm -rf temp2.tar.gz;ls"
           ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
           docker-compose -f docker-compose-non-dev.yml down 
-          docker stop $(docker ps -q)
-          docker rm $(docker ps -a -q)
-          docker rmi $(docker images -q)
+          docker image prune --all --force
           docker-compose -f docker-compose-non-dev.yml up -d
           docker-compose -f docker-compose-non-dev.yml ps"
           exit
