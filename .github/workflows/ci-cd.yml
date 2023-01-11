@@ -63,5 +63,6 @@ jobs:
           ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp.tar.gz;rm -rf temp.tar.gz;ls -lsa"
           ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp2.tar.gz;rm -rf temp2.tar.gz;ls -lsa"
           ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
+          docker-compose down 
           docker-compose -f docker-compose-non-dev.yml up -d"
           exit
