@@ -52,10 +52,10 @@ jobs:
           ssh-add /home/runner/.ssh/github_actions
 
       - name: Build and deploy
-        # env:
-        #   SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions
+          ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions
           "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
           docker-compose -f docker-compose-non-dev.yml up -d"
           exit
