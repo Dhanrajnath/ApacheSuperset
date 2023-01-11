@@ -9,33 +9,28 @@ on:
 
 jobs:
   CI:
-    name: Docker-CI
+    if: github.event.pull_request.draft == false
+    name: CI build docker and push to registry
     runs-on: ubuntu-latest
     steps:
-      - name: "println"
-        run: ls
-  #   if: github.event.pull_request.draft == false
-  #   name: CI build docker and push to registry
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
-  #       uses: actions/checkout@v2
-  #       with:
-  #         persist-credentials: false
+      - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false
 
-  #     - shell: bash
-  #       env:
-  #         DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-  #         DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-  #       run: |
-  #         .github/workflows/docker_build_push.sh
+      - shell: bash
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          .github/workflows/docker_build_push.sh
 
-  #     - name: Upload build artifacts
-  #       if: github.event_name == 'pull_request'
-  #       uses: actions/upload-artifact@v2
-  #       with:
-  #         name: build
-  #         path: build/
+      - name: Upload build artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build/
   CD:
     if: github.event.pull_request.draft == false
     name: CD - deploy on ec2
@@ -61,6 +56,5 @@ jobs:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
           ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions
-          "pwd"
-          "ls"
+          "docker-compose -f docker-compose-non-dev.yml up -d"
           exit
