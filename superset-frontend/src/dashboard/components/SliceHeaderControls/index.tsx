@@ -54,7 +54,7 @@ import ViewQueryModal from 'src/explore/components/controls/ViewQueryModal';
 import { ResultsPaneOnDashboard } from 'src/explore/components/DataTablesPane';
 import Modal from 'src/components/Modal';
 import { DrillDetailMenuItems } from 'src/components/Chart/DrillDetail';
-import { Switch } from 'src/components/Switch';
+// import { Switch } from 'src/components/Switch';
 
 const MENU_KEYS = {
   CROSS_FILTER_SCOPING: 'cross_filter_scoping',
@@ -546,7 +546,7 @@ class SliceHeaderControls extends React.PureComponent<
 
     return (
       <>
-        {t('Auto Refresh every 5 seconds')}
+        {/* {t('Auto Refresh every 5 seconds')}
         <Switch
           title="Auto Refresh for 5 seconds"
           loading={this.props.chartStatus === 'loading'}
@@ -571,7 +571,7 @@ class SliceHeaderControls extends React.PureComponent<
               );
             }
           }}
-        />
+        /> */}
         <CrossFilterScopingModal
           chartId={slice.slice_id}
           isOpen={this.state.showCrossFilterScopingModal}
