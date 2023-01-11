@@ -51,7 +51,7 @@ jobs:
           ssh-agent -a $SSH_AUTH_SOCK > /dev/null   
           ssh-add /home/runner/.ssh/github_actions
           tar -czvf temp.tar.gz docker
-          tar -czvf temp2.tar.gz *.yml
+          tar -czvf temp2.tar.gz docker-compose-non-dev.yml
           scp -i ~/.ssh/github_actions temp.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/ubuntu/
           scp -i ~/.ssh/github_actions temp2.tar.gz ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/home/ubuntu/
 
@@ -60,8 +60,9 @@ jobs:
         env:
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: |
-          ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp.tar.gz;rm -rf temp.tar.gz;ls -lsa"
-          ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp2.tar.gz;rm -rf temp2.tar.gz;ls -lsa"
+          ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp.tar.gz;rm -rf temp.tar.gz;ls"
+          ssh -i ~/.ssh/github_actions ${{ secrets.USERNAME }}@${{ secrets.HOST }} "tar -xzvf temp2.tar.gz;rm -rf temp2.tar.gz;ls"
           ssh -tt ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions "docker login --username ${{ secrets.DOCKERHUB_USER }} --password ${{ secrets.DOCKERHUB_TOKEN }}
+          docker-compose -f docker-compose-non-dev.yml down 
           docker-compose -f docker-compose-non-dev.yml up -d"
           exit
