@@ -546,7 +546,7 @@ class SliceHeaderControls extends React.PureComponent<
 
     return (
       <>
-        {t('Auto Refresh every 5 seconds')}
+        {t('Auto Refresh (5 seconds)')}
         <Switch
           title="Auto Refresh for 5 seconds"
           loading={this.props.chartStatus === 'loading'}
