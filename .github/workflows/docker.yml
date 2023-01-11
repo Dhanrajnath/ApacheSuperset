@@ -8,9 +8,9 @@ on:
     types: [synchronize, opened, reopened, ready_for_review]
 
 jobs:
-  docker-build:
+  CI:
     if: github.event.pull_request.draft == false
-    name: docker-build
+    name: CI build docker and push to registry
     runs-on: ubuntu-latest
     steps:
       - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
@@ -25,18 +25,39 @@ jobs:
         run: |
           .github/workflows/docker_build_push.sh
 
-      - name: Build ephemeral env image
-        if: github.event_name == 'pull_request'
-        run: |
-          mkdir -p ./build
-          echo ${{ github.sha }} > ./build/SHA
-          echo ${{ github.event.pull_request.number }} > ./build/PR-NUM
-          docker build --target ci -t ${{ github.sha }} -t "pr-${{ github.event.pull_request.number }}" .
-          docker save ${{ github.sha }} | gzip > ./build/${{ github.sha }}.tar.gz
-
       - name: Upload build artifacts
         if: github.event_name == 'pull_request'
         uses: actions/upload-artifact@v2
         with:
           name: build
           path: build/
+  CD:
+    if: github.event.pull_request.draft == false
+    name: CD - deploy on ec2
+    runs-on: ubuntu-latest
+    defaults: 
+       run: 
+         working-directory: backend
+    needs:
+      - CI     
+    steps:
+      - name: "Checkout ${{ github.ref }} ( ${{ github.sha }} )"
+        uses: actions/checkout@v2
+      - name: Add SSH key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p /home/runner/.ssh
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+          echo -e "${{ secrets.SSH_KEY }}" > /home/runner/.ssh/github_actions
+          chmod 600 /home/runner/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null   
+          ssh-add /home/runner/.ssh/github_actions
+
+      - name: Build and deploy
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh ${{ secrets.USERNAME }}@${{ secrets.HOST }} -i ~/.ssh/github_actions
+          "docker-compose up -d"
+          exit
