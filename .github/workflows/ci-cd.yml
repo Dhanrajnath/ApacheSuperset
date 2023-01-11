@@ -8,7 +8,12 @@ on:
     types: [synchronize, opened, reopened, ready_for_review]
 
 jobs:
-  # CI:
+  CI:
+    name: Docker-CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: "println"
+        run: ls
   #   if: github.event.pull_request.draft == false
   #   name: CI build docker and push to registry
   #   runs-on: ubuntu-latest
