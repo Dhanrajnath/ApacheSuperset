@@ -100,6 +100,11 @@ const BulkSelectWrapper = styled(Alert)`
       padding: ${theme.gridUnit * 2}px 0;
     }
 
+    .select-all {
+      color: ${theme.colors.primary.base};
+      margin-right: ${theme.gridUnit * 4}px;
+    }
+
     .deselect-all {
       color: ${theme.colors.primary.base};
       margin-left: ${theme.gridUnit * 4}px;
@@ -127,12 +132,12 @@ const bulkSelectColumnConfig = {
   Cell: ({ row }: any) => (
     <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} id={row.id} />
   ),
-  Header: ({ getToggleAllRowsSelectedProps }: any) => (
-    <IndeterminateCheckbox
-      {...getToggleAllRowsSelectedProps()}
-      id="header-toggle-all"
-    />
-  ),
+  // Header: ({ getToggleAllRowsSelectedProps }: any) => (
+  //   <IndeterminateCheckbox
+  //     {...getToggleAllRowsSelectedProps()}
+  //     id="header-toggle-all"
+  //   />
+  // ),
   id: 'selection',
   size: 'sm',
 };
@@ -356,6 +361,17 @@ function ListView<T extends object = any>({
               onClose={disableBulkSelect}
               message={
                 <>
+                  {Boolean(selectedFlatRows.length !== rows.length) && (
+                    <span
+                      data-test="bulk-select-select-all"
+                      role="button"
+                      tabIndex={0}
+                      className="select-all"
+                      onClick={() => toggleAllRowsSelected(true)}
+                    >
+                      {t('Select All')}
+                    </span>
+                  )}
                   <div className="selectedCopy" data-test="bulk-select-copy">
                     {renderBulkSelectCopy(selectedFlatRows)}
                   </div>
@@ -368,7 +384,7 @@ function ListView<T extends object = any>({
                         className="deselect-all"
                         onClick={() => toggleAllRowsSelected(false)}
                       >
-                        {t('Deselect all')}
+                        {t('Deselect All')}
                       </span>
                       <div className="divider" />
                       {bulkActions.map(action => (
