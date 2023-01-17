@@ -132,12 +132,7 @@ const bulkSelectColumnConfig = {
   Cell: ({ row }: any) => (
     <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} id={row.id} />
   ),
-  // Header: ({ getToggleAllRowsSelectedProps }: any) => (
-  //   <IndeterminateCheckbox
-  //     {...getToggleAllRowsSelectedProps()}
-  //     id="header-toggle-all"
-  //   />
-  // ),
+  Header: ({ getToggleAllRowsSelectedProps }: any) => null,
   id: 'selection',
   size: 'sm',
 };
