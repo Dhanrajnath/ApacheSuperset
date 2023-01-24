@@ -135,6 +135,8 @@ function DashboardCard({
       )}
     </Menu>
   );
+  console.log(dashboard.thumbnail_url);
+
   return (
     <CardStyles
       onClick={() => {
