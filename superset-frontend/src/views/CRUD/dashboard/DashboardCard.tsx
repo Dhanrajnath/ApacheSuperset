@@ -135,7 +135,7 @@ function DashboardCard({
       )}
     </Menu>
   );
-  console.log(dashboard.thumbnail_url);
+  console.log(dashboard);
 
   return (
     <CardStyles
