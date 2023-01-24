@@ -116,6 +116,18 @@ THUMBNAIL_CACHE_CONFIG: CACHE_CONFIG = {
     'CACHE_NO_NULL_WARNING': True,
     'CACHE_REDIS_URL': 'redis://redis:6379/1'
 }
+WEBDRIVER_TYPE= "chrome"
+# for older versions this was  EMAIL_REPORTS_WEBDRIVER = "chrome"
+WEBDRIVER_OPTION_ARGS = [
+        "--force-device-scale-factor=2.0",
+        "--high-dpi-support=2.0",
+        "--headless",
+        "--disable-gpu",
+        "--disable-dev-shm-usage",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-extensions",
+        ]
 
 FEATURE_FLAGS = {
     "THUMBNAILS": True,
