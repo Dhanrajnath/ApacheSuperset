@@ -107,32 +107,11 @@ WEBDRIVER_BASEURL = "http://localhost:8088/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
 
-FEATURE_FLAGS = { "THUMBNAILS" : True, "LISTVIEWS_DEFAULT_CARD_VIEW" : True}
-THUMBNAIL_SELENIUM_USER = "admin"
-THUMBNAIL_CACHE_CONFIG: CACHE_CONFIG = {
-    'CACHE_TYPE': 'redis',
-    'CACHE_DEFAULT_TIMEOUT': 24*60*60,
-    'CACHE_KEY_PREFIX': 'thumbnail_',
-    'CACHE_NO_NULL_WARNING': True,
-    'CACHE_REDIS_URL': 'redis://redis:6379/1'
-}
-WEBDRIVER_TYPE= "chrome"
-# for older versions this was  EMAIL_REPORTS_WEBDRIVER = "chrome"
-WEBDRIVER_OPTION_ARGS = [
-        "--force-device-scale-factor=2.0",
-        "--high-dpi-support=2.0",
-        "--headless",
-        "--disable-gpu",
-        "--disable-dev-shm-usage",
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-extensions",
-        ]
-
 FEATURE_FLAGS = {
     "THUMBNAILS": True,
     "THUMBNAILS_SQLA_LISTENERS": True,
 }
+THUMBNAIL_SELENIUM_USER = "admin"
 
 SQLLAB_CTAS_NO_LIMIT = True
 
