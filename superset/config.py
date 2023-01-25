@@ -418,7 +418,7 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     # and doesn't work with all nested types.
     "PRESTO_EXPAND_DATA": False,
     # Exposes API endpoint to compute thumbnails
-    "THUMBNAILS": True,
+    "THUMBNAILS": False,
     "DASHBOARD_CACHE": False,
     "REMOVE_SLICE_LEVEL_LABEL_COLORS": False,
     "SHARE_QUERIES_VIA_KV_STORE": False,
@@ -589,8 +589,8 @@ THUMBNAIL_SELENIUM_USER: Optional[str] = "admin"
 # define which user to execute the thumbnails and potentially custom functions for
 # calculating thumbnail digests. To have unique thumbnails for all users, use the
 # following config:
-THUMBNAIL_EXECUTE_AS = [ExecutorType.CURRENT_USER]
-# THUMBNAIL_EXECUTE_AS = [ExecutorType.SELENIUM]
+# THUMBNAIL_EXECUTE_AS = [ExecutorType.CURRENT_USER]
+THUMBNAIL_EXECUTE_AS = [ExecutorType.SELENIUM]
 
 # By default, thumbnail digests are calculated based on various parameters in the
 # chart/dashboard metadata, and in the case of user-specific thumbnails, the
@@ -608,7 +608,7 @@ THUMBNAIL_DASHBOARD_DIGEST_FUNC: Optional[
 THUMBNAIL_CHART_DIGEST_FUNC: Optional[Callable[[Slice, ExecutorType, str], str]] = None
 
 THUMBNAIL_CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "redis",
+    "CACHE_TYPE": "NullCache",
     "CACHE_NO_NULL_WARNING": True,
 }
 
