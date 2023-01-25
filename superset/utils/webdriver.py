@@ -123,7 +123,6 @@ class WebDriverProxy:
             profile.set_preference("layout.css.devPixelsPerPx", str(pixel_density))
             kwargs: Dict[Any, Any] = dict(options=options, firefox_profile=profile)
         elif self._driver_type == "chrome":
-            print(":CHROME **************************")
             driver_class = chrome.webdriver.WebDriver
             options = chrome.options.Options()
             options.add_argument(f"--force-device-scale-factor={pixel_density}")
