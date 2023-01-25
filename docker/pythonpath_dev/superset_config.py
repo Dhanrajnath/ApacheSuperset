@@ -106,14 +106,15 @@ ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
 WEBDRIVER_BASEURL = "http://localhost:8088/"
 # The base URL for the email report hyperlinks.
 WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
-
+WEBDRIVER_TYPE="chrome"
 FEATURE_FLAGS = {
     "THUMBNAILS": True,
     "THUMBNAILS_SQLA_LISTENERS": True,
 }
 THUMBNAIL_SELENIUM_USER = "admin"
-
+THUMBNAIL_EXECUTE_AS = [ExecutorType.CURRENT_USER]
 SQLLAB_CTAS_NO_LIMIT = True
+ENABLE_EXPLORE_JSON_DOWNLOAD = True
 
 #
 # Optionally import superset_config_docker.py (which will have been included on
