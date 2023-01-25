@@ -589,8 +589,8 @@ THUMBNAIL_SELENIUM_USER: Optional[str] = "admin"
 # define which user to execute the thumbnails and potentially custom functions for
 # calculating thumbnail digests. To have unique thumbnails for all users, use the
 # following config:
-# THUMBNAIL_EXECUTE_AS = [ExecutorType.CURRENT_USER]
-THUMBNAIL_EXECUTE_AS = [ExecutorType.SELENIUM]
+THUMBNAIL_EXECUTE_AS = [ExecutorType.CURRENT_USER]
+# THUMBNAIL_EXECUTE_AS = [ExecutorType.SELENIUM]
 
 # By default, thumbnail digests are calculated based on various parameters in the
 # chart/dashboard metadata, and in the case of user-specific thumbnails, the
@@ -608,7 +608,7 @@ THUMBNAIL_DASHBOARD_DIGEST_FUNC: Optional[
 THUMBNAIL_CHART_DIGEST_FUNC: Optional[Callable[[Slice, ExecutorType, str], str]] = None
 
 THUMBNAIL_CACHE_CONFIG: CacheConfig = {
-    "CACHE_TYPE": "NullCache",
+    "CACHE_TYPE": "redis",
     "CACHE_NO_NULL_WARNING": True,
 }
 
