@@ -106,13 +106,30 @@ CMD /usr/bin/run-server.sh
 FROM lean AS dev
 ARG GECKODRIVER_VERSION=v0.32.0
 ARG FIREFOX_VERSION=106.0.3
-
+ARG CHROMEDRIVER_VERSION=109.0.5414.74
+ARG CHROME_VERSION=current
+# 72.0.3626
 COPY ./requirements/*.txt ./docker/requirements-*.txt/ /app/requirements/
 
 USER root
 
 RUN apt-get update -y \
-    && apt-get install -y --no-install-recommends libnss3 libdbus-glib-1-2 libgtk-3-0 libx11-xcb1 wget
+    && apt-get install -y --no-install-recommends libnss3 libdbus-glib-1-2 libgtk-3-0 libx11-xcb1 wget unzip
+
+# Install Chrome
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_${CHROME_VERSION}_amd64.deb
+RUN apt-get update && apt-get install -y ./google-chrome-stable_${CHROME_VERSION}_amd64.deb
+
+# Download Chrome WebDriver
+RUN wget -N https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip -P ~/
+# Unzip Chrome WebDriver
+RUN unzip ~/chromedriver_linux64.zip -d ~/
+
+# Move Chrome WebDriver to /usr/local/bin/
+RUN mv -f ~/chromedriver /usr/local/bin/chromedriver
+
+# Add permissions to the Chrome WebDriver
+RUN chmod +x /usr/local/bin/chromedriver
 
 # Install GeckoDriver WebDriver
 RUN wget https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz -O /tmp/geckodriver.tar.gz && \

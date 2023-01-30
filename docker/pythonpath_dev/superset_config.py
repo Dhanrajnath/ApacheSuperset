@@ -69,6 +69,7 @@ REDIS_RESULTS_DB = get_env_variable("REDIS_RESULTS_DB", "1")
 
 RESULTS_BACKEND = FileSystemCache("/app/superset_home/sqllab")
 
+# Metadata Caching
 CACHE_CONFIG = {
     "CACHE_TYPE": "redis",
     "CACHE_DEFAULT_TIMEOUT": 300,
@@ -82,11 +83,12 @@ DATA_CACHE_CONFIG = CACHE_CONFIG
 
 class CeleryConfig(object):
     BROKER_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_CELERY_DB}"
-    CELERY_IMPORTS = ("superset.sql_lab",)
+    CELERY_IMPORTS = ("superset.sql_lab", "superset.tasks",
+                      "superset.tasks.thumbnails",)
     CELERY_RESULT_BACKEND = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_RESULTS_DB}"
     CELERYD_LOG_LEVEL = "DEBUG"
-    CELERYD_PREFETCH_MULTIPLIER = 1
-    CELERY_ACKS_LATE = False
+    CELERYD_PREFETCH_MULTIPLIER = 10
+    CELERY_ACKS_LATE = True
     CELERYBEAT_SCHEDULE = {
         "reports.scheduler": {
             "task": "reports.scheduler",
@@ -101,17 +103,56 @@ class CeleryConfig(object):
 
 CELERY_CONFIG = CeleryConfig
 
-FEATURE_FLAGS = {"ALERT_REPORTS": True}
-ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
-WEBDRIVER_BASEURL = "http://localhost:8088/"
-# The base URL for the email report hyperlinks.
-WEBDRIVER_BASEURL_USER_FRIENDLY = WEBDRIVER_BASEURL
+SCREENSHOT_LOCATE_WAIT = 100
+SCREENSHOT_LOAD_WAIT = 600
 
 FEATURE_FLAGS = {
+    "ALERT_REPORTS": True,
     "THUMBNAILS": True,
     "THUMBNAILS_SQLA_LISTENERS": True,
+    "DASHBOARD_CACHE": True,
+    "UX_BETA": True,
+    "LISTVIEWS_DEFAULT_CARD_VIEW": True,
+    "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": True
 }
+THUMBNAILS_PROVIDER = 'pillow'
+THUMBNAILS_SIZE = (100, 100)
+
+ALERT_REPORTS_NOTIFICATION_DRY_RUN = True
+WEBDRIVER_BASEURL = "http://superset:8088/"
+# The base URL for the email report hyperlinks.
+WEBDRIVER_BASEURL_USER_FRIENDLY = "http://localhost:8088/"
+
+# these are the default settings and included for reference reasons
+WEBDRIVER_TYPE = "chrome"
+WEBDRIVER_WINDOW = {
+    "dashboard": (1600, 2000),
+    "slice": (3000, 1200),
+    "pixel_density": 1,
+}
+WEBDRIVER_PATH = '/usr/local/bin/chromedriver'
+WEBDRIVER_OPTION_ARGS = [
+    "--force-device-scale-factor=2.0",
+    "--high-dpi-support=2.0",
+    "--headless",
+    "--disable-gpu",
+    "--disable-dev-shm-usage",
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-extensions"
+]
+
+
+# Thumbnail Caching
 THUMBNAIL_SELENIUM_USER = "admin"
+THUMBNAIL_CACHE_CONFIG = {
+    "CACHE_TYPE": "redis",
+    "CACHE_DEFAULT_TIMEOUT": 300,
+    "CACHE_KEY_PREFIX": "thumbnail_",
+    "CACHE_REDIS_HOST": REDIS_HOST,
+    "CACHE_REDIS_PORT": REDIS_PORT,
+    "CACHE_REDIS_DB": REDIS_RESULTS_DB,
+}
 
 SQLLAB_CTAS_NO_LIMIT = True
 
