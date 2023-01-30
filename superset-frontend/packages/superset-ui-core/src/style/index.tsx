@@ -68,6 +68,8 @@ const defaultTheme = {
       light3: '#D2EDF4',
       light4: '#E9F6F9',
       light5: '#F3F8FA',
+      light6: '#ff0000',
+      light7: '#ffffff',
     },
     secondary: {
       base: '#444E7C',
