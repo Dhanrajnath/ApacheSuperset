@@ -404,7 +404,7 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     # When ENABLE_EXPLORE_JSON_CSRF_PROTECTION is set to true, your users cannot
     # make GET request to explore_json. explore_json accepts both GET and POST request.
     # See `PR 7935 <https://github.com/apache/superset/pull/7935>`_ for more details.
-    "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": False,
+    "ENABLE_EXPLORE_JSON_CSRF_PROTECTION": True,
     "ENABLE_TEMPLATE_PROCESSING": False,
     "ENABLE_TEMPLATE_REMOVE_FILTERS": False,
     # Allow for javascript controls components

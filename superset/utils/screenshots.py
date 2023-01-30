@@ -74,7 +74,6 @@ class BaseScreenshot:
     ) -> Optional[bytes]:
         driver = self.driver(window_size)
         self.screenshot = driver.get_screenshot(self.url, self.element, user)
-        print("Dhanraj ",self.screenshot)
         return self.screenshot
 
     def get(
