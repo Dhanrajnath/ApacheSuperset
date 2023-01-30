@@ -97,6 +97,7 @@ const IconFileNames = [
   'function_x',
   'gear',
   'grid',
+  'help_icon',
   'image',
   'import',
   'info',

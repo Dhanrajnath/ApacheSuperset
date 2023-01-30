@@ -41,6 +41,7 @@ import { store } from 'src/views/store';
 import { RootContextProviders } from './RootContextProviders';
 import { ScrollToTop } from './ScrollToTop';
 import QueryProvider from './QueryProvider';
+import HelpSupport from './HelpSupport';
 
 setupApp();
 setupPlugins();
@@ -90,6 +91,7 @@ const App = () => (
             </Route>
           ))}
         </Switch>
+        <HelpSupport />
         <ToastContainer />
       </RootContextProviders>
     </Router>
